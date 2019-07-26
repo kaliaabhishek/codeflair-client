@@ -11,14 +11,23 @@ class ShowSnippet extends Component {
   }
 
   componentDidMount = () => {
-    axios.get(`http://localhost:3001/snippets/${this.props.match.params.id}`)
+    axios.get(`https://codeflair.herokuapp.com/snippets/${this.props.match.params.id}`)
       .then(res => this.setState({ snippet: res.data }))
       .catch(err => console.log(err))
   }
 
+  style = `
+    .CodeMirror{
+      height:auto;
+    }
+  `
+
   render() {
     return (
       <div className="NewSnippet">
+        <style>
+          {this.style}
+        </style>
         {this.state.snippet && <CodeMirror
           options={{
             mode: this.state.snippet.mode,

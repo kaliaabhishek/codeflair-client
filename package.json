@@ -6,6 +6,8 @@
     "axios": "^0.18.0",
     "bootstrap": "^4.2.1",
     "codemirror": "^5.42.2",
+    "faker": "^4.1.0",
+    "lang-map": "^0.4.0",
     "normalize.css": "^8.0.1",
     "react": "^16.7.0",
     "react-codemirror2": "^5.1.0",
@@ -14,7 +16,11 @@
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "react-scripts": "2.1.2",
-    "reactstrap": "^7.0.2"
+    "react-switch": "^3.0.4",
+    "react-toastify": "^4.5.2",
+    "reactstrap": "^7.0.2",
+    "semantic-ui-css": "^2.4.1",
+    "semantic-ui-react": "^0.84.0"
   },
   "scripts": {
     "start": "react-scripts start",

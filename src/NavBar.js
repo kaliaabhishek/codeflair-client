@@ -7,7 +7,7 @@ function NavBar() {
     <div>
       <Navbar style={{ paddingRight: '20px', paddingLeft: '30px' }}>
         <NavbarBrand href="/">
-          <img src={logo} alt="CodeFlair" width="120" />
+          <img src={logo} alt="CodeFlair" width="150" />
         </NavbarBrand>
         <Nav>
           <NavItem>

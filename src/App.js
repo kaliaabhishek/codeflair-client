@@ -3,12 +3,19 @@ import axios from "axios"
 import './App.css';
 import NavBar from './NavBar';
 import NewSnippet from './NewSnippet';
-import { Switch, Route } from "react-router-dom"
+import { Switch, Route, Redirect } from "react-router-dom"
 import ShowSnippet from './ShowSnippet';
 import Embedable from './Embedable';
+import { ToastContainer, toast } from "react-toastify"
+import Home from './Home';
+import faker from "faker"
 require('codemirror/mode/ruby/ruby');
 require('codemirror/mode/python/python');
-require('codemirror/mode/javascript/javascript');
+require('codemirror/mode/jsx/jsx');
+require('codemirror/mode/xml/xml');
+require('codemirror/mode/clike/clike');
+
+const map = require('lang-map')
 
 class App extends Component {
   constructor() {
@@ -16,7 +23,7 @@ class App extends Component {
     this.state = {
       loggedIn: false,
       code: "",
-      author: "",
+      author: null,
       title: "",
       theme: "material",
       mode: "Text",
@@ -24,7 +31,11 @@ class App extends Component {
       ext: ".txt",
       themeDropDownOpen: false,
       fileTypeDropDownOpen: false,
-      navbarVisible: true
+      navbarVisible: false,
+      redirect: false,
+      lineNumbers: true,
+      font: "inconsolata",
+      filename: null
     }
   }
 
@@ -51,23 +62,41 @@ class App extends Component {
     this.setState({ code: value })
   }
 
-  onTextChange = (e) => { this.setState({ [e.target.name]: e.target.value }) }
+  onTextChange = (e) => {
+    this.setState({ [e.target.name]: e.target.value })
+    if (e.target.name === "filename") {
+      const ext = e.target.value.split(".")[1]
+      if (ext === "html") {
+        this.setState({ mode: 'xml' })
+      } else if (ext === "java") {
+        this.setState({ mode: 'clike' })
+      } else {
+        let mode = map.languages(String(ext))[0]
+        this.setState({ mode: mode })
+      }
+    }
+  }
+
+  toggleLineNumbers = () => { this.setState({ lineNumbers: !this.state.lineNumbers }) }
 
   onSubmit = () => {
+    this.setState({ saving: true })
     axios.post('https://codeflair.herokuapp.com/snippets', {
       "snippet": {
-        "title": this.state.title,
+        "title": this.state.filename,
         "author": this.state.author,
         "content": this.state.code,
         "theme": this.state.theme,
-        "mode": this.state.mode
+        "mode": this.state.mode,
+        "font": this.state.font
       }
     })
       .then(res => {
-        console.log(res.data)
+        toast.success("🙌 Snippet Saved!", { autoClose: 1500 })
+        this.setState({ redirect: true, id: res.data.id, saving: false })
       })
       .catch(err => {
-        console.log(err)
+        toast.error("🤒" + err.message)
       })
     localStorage.setItem('author', this.state.author)
   }
@@ -76,12 +105,14 @@ class App extends Component {
     this.setState({ navbarVisible: false })
   }
 
+
   render() {
     return (
       <div className="App">
+        <ToastContainer />
         {this.state.navbarVisible && <NavBar />}
         <Switch>
-          <Route path="/" exact render={(p) => <NewSnippet {...p} theme={this.state.theme}
+          <Route path="/" exact render={(p) => <Home {...p} theme={this.state.theme}
             lineNumbers={this.state.lineNumbers}
             ext={this.state.ext}
             onEditorChange={this.onEditorChange}
@@ -95,10 +126,16 @@ class App extends Component {
             code={this.state.code}
             title={this.state.title}
             author={this.state.author}
-            onSubmit={this.onSubmit} />} />
+            onSubmit={this.onSubmit}
+            font={this.state.font}
+            toggleLineNumbers={this.toggleLineNumbers}
+            filename={this.state.filename}
+          />}
+          />
           <Route path="/snippets/:id" exact component={ShowSnippet} />
           <Route path="/embed/:id" exact render={(p) => <Embedable {...p} disableNavBar={this.disableNavBar} />} />
         </Switch>
+        {this.state.redirect && this.state.id && <Redirect to={`/snippets/${this.state.id}`} />}
       </div>
     );
   }

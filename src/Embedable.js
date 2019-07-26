@@ -28,9 +28,17 @@ class Embedable extends Component {
     }
   }
 
+  style = `
+  .CodeMirror{
+    height:auto;
+    width:100%;
+  }
+`
+
   render() {
     return (
       <div>
+        <style>{this.style}</style>
         {this.state.snippet &&
           <div>
             <CodeMirror
@@ -44,7 +52,14 @@ class Embedable extends Component {
               value={this.state.snippet.content}
               className="editor"
             />
-            <br />
+            <div className="editor-header" style={{ position: "fixed", display: "absolute" }}>
+              <div className="filename">
+                {this.state.snippet.title}
+              </div>
+              <div className="acknowledgement">
+                Created by <b>{this.state.snippet.author}</b> using <span style={{ fontFamily: "Roboto Mono", fontWeight: "bolder" }}>Snippster</span>
+              </div>
+            </div>
           </div>
         }
       </div>
